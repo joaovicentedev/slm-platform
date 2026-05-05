@@ -1,0 +1,7 @@
+[project]
+name = "slm-api"
+version = "0.1.0"
+description = "SLM training and inference project"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
