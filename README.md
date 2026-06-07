@@ -33,8 +33,8 @@ The system is composed of three main layers:
 
 2. **Serving Layer**
 
-   * Model loading and inference
-   * API exposure (FastAPI)
+   * vLLM OpenAI-compatible inference server
+   * Product-side OpenAI client integration
    * Observability and performance tracking
 
 3. **Infrastructure Layer**
@@ -46,7 +46,7 @@ The system is composed of three main layers:
 ### High-level Flow
 
 ```
-Dataset → Training → Model Artifact (S3) → Inference API → Client
+Dataset → Hugging Face + PEFT Fine-Tune → LoRA Adapter → Merged Model → vLLM OpenAI API → Client
 ```
 
 ---
@@ -122,7 +122,7 @@ slm-api/
 * Target: efficient fine-tuning and low-latency inference
 * Expected deployment:
 
-  * CPU (baseline)
+  * MacBook CPU via vLLM CPU Docker image for local development
   * GPU (optional scaling)
 
 ---
@@ -144,7 +144,8 @@ The training module is responsible for:
 
 ### Outputs
 
-* Model weights
+* LoRA adapter
+* Merged model weights
 * Tokenizer
 * Config files
 * Evaluation metrics
@@ -153,19 +154,19 @@ The training module is responsible for:
 
 ## Inference API
 
-The serving layer exposes the model through a production-ready API.
+The serving layer exposes the model through vLLM's OpenAI-compatible API.
 
 ### Features
 
-* FastAPI-based HTTP API
+* OpenAI-compatible `/v1/chat/completions` API
 * Stateless service
-* Model loaded at startup
-* Structured request/response schemas
+* Model loaded by vLLM at startup
+* Product code can use the OpenAI SDK against the vLLM base URL
 * Ready for horizontal scaling
 
 ### Responsibilities
 
-* Load model from artifact store (S3/local)
+* Load merged model from artifact store (S3/local)
 * Handle inference requests
 * Log metrics and latency
 * Integrate with monitoring tools
@@ -173,10 +174,11 @@ The serving layer exposes the model through a production-ready API.
 ### Example Endpoint
 
 ```
-POST /v1/generate
+POST /v1/chat/completions
 
 {
-  "prompt": "Explain Kubernetes in simple terms",
+  "model": "slm",
+  "messages": [{"role": "user", "content": "Explain Kubernetes in simple terms"}],
   "max_tokens": 100
 }
 ```
