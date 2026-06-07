@@ -4,7 +4,7 @@ COMPOSE := docker compose
 UV := uv
 PYTHON := ./.venv/bin/python
 
-.PHONY: help sync lock test test-python test-compose test-imports test-training-imports test-serving test-client merge-lora docker-build docker-up docker-up-serving docker-up-training docker-down docker-logs docker-logs-serving docker-logs-training docker-ps docker-shell-serving docker-restart docker-config serve clean
+.PHONY: help sync lock test test-python test-pytest test-compose test-imports test-training-imports test-serving test-client merge-lora docker-build docker-up docker-up-serving docker-up-training docker-down docker-logs docker-logs-serving docker-logs-training docker-ps docker-shell-serving docker-restart docker-config serve clean
 
 help:
 	@printf "Available targets:\n"
@@ -12,6 +12,7 @@ help:
 	@printf "  lock           Refresh uv.lock\n"
 	@printf "  test           Run the current local verification suite\n"
 	@printf "  test-python    Compile Python sources\n"
+	@printf "  test-pytest    Run pytest tests\n"
 	@printf "  test-compose   Validate docker compose config\n"
 	@printf "  test-imports   Verify core Python imports in .venv\n"
 	@printf "  test-training-imports Verify training imports with the training group\n"
@@ -39,10 +40,13 @@ sync:
 lock:
 	$(UV) lock
 
-test: test-python test-compose test-imports
+test: test-python test-pytest test-compose test-imports
 
 test-python:
 	python3 -m compileall serving training
+
+test-pytest:
+	$(UV) run pytest
 
 test-compose:
 	$(COMPOSE) config

@@ -33,6 +33,12 @@ Verify the core packages:
 make test-imports
 ```
 
+Run the local verification suite, including pytest tests:
+
+```bash
+make test
+```
+
 ## VS Code
 
 If VS Code shows errors like `Import "fastapi" could not be resolved`, select the project interpreter:

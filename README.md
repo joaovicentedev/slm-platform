@@ -5,7 +5,7 @@ It is designed as a monorepo to keep development velocity high while maintaining
 
 The system is built around:
 
-* Fine-tuning a **~350M parameter model (LFM2.5-350M)**
+* Fine-tuning and serving a small Hugging Face model, currently **HuggingFaceTB/SmolLM2-135M-Instruct** for local development
 * Serving inference through a scalable API
 * Managing infrastructure with Terraform
 * Deploying to AWS with Kubernetes (EKS)
@@ -118,12 +118,15 @@ slm-api/
 
 ## Model
 
-* Base model: **LFM2.5-350M**
+* Current local base model: **HuggingFaceTB/SmolLM2-135M-Instruct**
+* Served model name: **slm**
 * Target: efficient fine-tuning and low-latency inference
 * Expected deployment:
 
   * MacBook CPU via vLLM CPU Docker image for local development
   * GPU (optional scaling)
+
+The local model is intentionally small so the vLLM CPU image can run on a MacBook. Set `VLLM_MODEL` to serve a different Hugging Face model or a merged local artifact such as `/artifacts/model`.
 
 ---
 
